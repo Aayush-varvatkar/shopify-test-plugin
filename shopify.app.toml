@@ -2,7 +2,7 @@
 
 client_id = "395697314799471ff305c646004ad466"
 name = "test-plugin"
-application_url = "https://example.com"
+application_url = "https://goals-listen-plumbing-dogs.trycloudflare.com"
 embedded = true
 
 [build]
@@ -26,7 +26,7 @@ optional_scopes = [ ]
 use_legacy_install_flow = false
 
 [auth]
-redirect_urls = [ ]
+redirect_urls = [ "https://goals-listen-plumbing-dogs.trycloudflare.com/auth/callback" ]
 
 [product.metafields.app.demo_info]
 type = "single_line_text_field"
