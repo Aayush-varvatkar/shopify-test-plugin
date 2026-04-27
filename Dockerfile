@@ -1,21 +1,4 @@
-# ---- Builder stage ----
-FROM node:20-alpine AS builder
-RUN apk add --no-cache openssl
-
-WORKDIR /app
-
-COPY package.json package-lock.json* ./
-
-# Install ALL dependencies (including devDependencies) so that
-# Vite and TypeScript are available for `react-router build`.
-RUN npm ci && npm cache clean --force
-
-COPY . .
-
-RUN npm run build
-
-# ---- Production stage ----
-FROM node:20-alpine AS production
+FROM node:20-alpine
 RUN apk add --no-cache openssl
 
 EXPOSE 3000
@@ -24,11 +7,16 @@ WORKDIR /app
 
 COPY package.json package-lock.json* ./
 
-RUN npm ci --omit=dev && npm cache clean --force
+# Install ALL dependencies (including devDependencies) so Vite can build
+RUN npm ci
 
-# Copy the compiled build output from the builder stage.
-COPY --from=builder /app/build ./build
+COPY . .
 
+# Run the build while we still have devDependencies
 RUN npm run build
+
+# NOW set to production and remove dev dependencies to save space
+ENV NODE_ENV=production
+RUN npm prune --omit=dev
 
 CMD ["npm", "run", "docker-start"]
