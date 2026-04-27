@@ -8,7 +8,8 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install ALL dependencies (including devDependencies) so Vite can build
-RUN npm ci
+# Using npm install instead of npm ci to fix cross-platform optional dependency bugs
+RUN npm install
 
 COPY . .
 
