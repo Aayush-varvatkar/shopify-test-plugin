@@ -1,6 +1,10 @@
 # ---- Builder stage ----
-FROM node:20-alpine AS builder
-RUN apk add --no-cache openssl
+# Use Debian (glibc) so that Rollup's platform-specific native binary
+# (@rollup/rollup-linux-x64-gnu) is installed correctly by npm ci.
+# Alpine (musl) triggers a known npm bug with optional dependencies:
+# https://github.com/npm/cli/issues/4828
+FROM node:20-slim AS builder
+RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
