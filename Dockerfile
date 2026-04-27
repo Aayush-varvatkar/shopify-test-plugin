@@ -5,10 +5,10 @@ EXPOSE 3000
 
 WORKDIR /app
 
-COPY package.json package-lock.json* ./
+COPY package.json ./
 
-# Install ALL dependencies (including devDependencies) so Vite can build
-# Using npm install instead of npm ci to fix cross-platform optional dependency bugs
+# We DO NOT copy package-lock.json here so npm forces a fresh resolution for Alpine Linux.
+# This prevents the Rollup/Vite optional dependency bug!
 RUN npm install
 
 COPY . .
