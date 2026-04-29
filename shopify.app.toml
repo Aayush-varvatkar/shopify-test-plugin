@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "395697314799471ff305c646004ad466"
+client_id = "db29b5133308a461e1bd6793dd40050b"
 name = "test-plugin"
-application_url = "https://postgres-production-7a24c.up.railway.app"
+application_url = "https://shopify-test-plugin-production.up.railway.app"
 embedded = true
 
 [build]
@@ -26,7 +26,7 @@ optional_scopes = [ ]
 use_legacy_install_flow = false
 
 [auth]
-redirect_urls = [ "https://postgres-production-7a24c.up.railway.app/auth/callback" ]
+redirect_urls = [ "https://shopify-test-plugin-production.up.railway.app/auth/callback" ]
 
 [product.metafields.app.demo_info]
 type = "single_line_text_field"
