@@ -52,9 +52,6 @@ export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
   const shop = session.shop;
 
-  const logisticsSettings = await prisma.logisticsSettings.findUnique({
-    where: { shop },
-  });
 
   const response = await admin.graphql(`
     #graphql
@@ -125,57 +122,7 @@ export const loader = async ({ request }) => {
     return { ...order, orderDeliveryStatus };
   });
 
-  // Apply Live BlueDart API over default Shopify assumptions if keys are present
-  if (logisticsSettings?.trackingKey && logisticsSettings?.shippingApiKey) {
-    const liveTrackingOrders = await Promise.all(enhancedOrders.map(async (order) => {
-      let mainDeliveryStatus = order.orderDeliveryStatus;
 
-      if (order.fulfillments && order.fulfillments.length > 0) {
-        const liveFulfillments = await Promise.all(order.fulfillments.map(async (f) => {
-          if (f.trackingInfo && f.trackingInfo.length > 0) {
-            const liveTrackingInfo = await Promise.all(f.trackingInfo.map(async (tracking) => {
-              if (tracking.number) {
-                 try {
-                   // --- BLUEDART API FETCH INTEGRATION ---
-                   // Note: Adjust the exact JSON extraction (e.g. data.status) based on BlueDart's real schema if parsing fails.
-                   const apiUrl = `https://apigateway.bluedart.com/in/transportation/tracking/v1/shipments?trackingNumber=${tracking.number}`;
-                   
-                   const trackingRes = await fetch(apiUrl, {
-                     headers: {
-                       'LicenseKey': logisticsSettings.shippingApiKey,
-                       'TrackingKey': logisticsSettings.trackingKey
-                     }
-                   });
-
-                   if (trackingRes.ok) {
-                     const data = await trackingRes.json();
-                     
-                     // Generic JSON drilldown to find 'status' string safely.
-                     const actualApiStatus = data?.status || data?.shipments?.[0]?.status?.status || data?.ShipmentData?.DeliveryStatus || '';
-                     
-                     if (actualApiStatus) {
-                        const liveStatus = normalizeDeliveryStatus(actualApiStatus);
-                        mainDeliveryStatus = liveStatus;
-                        return { ...tracking, courierDeliveryStatus: liveStatus };
-                     }
-                   }
-                 } catch (e) {
-                   console.error("BlueDart Fetch Error:", e);
-                 }
-              }
-              return tracking;
-            }));
-            return { ...f, trackingInfo: liveTrackingInfo };
-          }
-          return f;
-        }));
-        return { ...order, fulfillments: liveFulfillments, orderDeliveryStatus: mainDeliveryStatus };
-      }
-      return order;
-    }));
-
-    return liveTrackingOrders;
-  }
 
   return enhancedOrders;
 };
