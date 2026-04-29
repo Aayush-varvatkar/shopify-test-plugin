@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
-import prisma from "../db.server";
+
 import {
   AppProvider,
   Page,
