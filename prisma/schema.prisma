@@ -34,9 +34,3 @@ model Session {
   refreshTokenExpires DateTime?
 }
 
-model LogisticsSettings {
-  id              Int      @id @default(autoincrement())
-  shop            String   @unique
-  trackingKey     String?
-  shippingApiKey  String?
-}
