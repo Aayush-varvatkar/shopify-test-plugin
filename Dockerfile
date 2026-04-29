@@ -13,6 +13,7 @@ RUN npm install
 
 COPY . .
 
+# Run the build while we still have devDependencies
 RUN npm run build
 
 # NOW set to production and remove dev dependencies to save space
