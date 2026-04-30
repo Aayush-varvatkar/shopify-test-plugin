@@ -44,7 +44,7 @@ export const loader = async ({ request }) => {
   const response = await admin.graphql(`
     #graphql
     query getOrdersWithTracking {
-      orders(first: 50, sortKey: CREATED_AT, reverse: true) {
+      orders(first: 250, sortKey: CREATED_AT, reverse: true) {
         edges {
           node {
             id
